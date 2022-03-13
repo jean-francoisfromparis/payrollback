@@ -1,11 +1,6 @@
-package com.jffromparis.payroll.controller;
+package payroll.controller;
 
 import java.util.List;
-
-
-import com.jffromparis.payroll.model.Employee;
-import com.jffromparis.payroll.repository.EmployeeCrudRepository;
-import com.jffromparis.payroll.repository.EmployeeRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import payroll.model.Employee;
+import payroll.repository.EmployeeCrudRepository;
+import payroll.repository.EmployeeRepository;
 
 /**
  * @Author jffromparis

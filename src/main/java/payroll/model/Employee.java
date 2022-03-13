@@ -1,4 +1,4 @@
-package com.jffromparis.payroll.model;
+package payroll.model;
 
 import java.util.Objects;
 import javax.persistence.Entity;

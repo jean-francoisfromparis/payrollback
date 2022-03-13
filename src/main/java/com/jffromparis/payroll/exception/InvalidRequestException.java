@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @since 03/12/2022
 */
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class EmployeeNotFoundException extends RuntimeException {
-
-    public EmployeeNotFoundException(Long id) {
-        super("L'employé.e " + id + "ne figure pas dans la base");
+public class InvalidRequestException extends RuntimeException {
+    public InvalidRequestException(String s) {
+        super(s);
     }
-
 }

@@ -5,6 +5,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+/**
+ * @Author jffromparis
+ * @email jeanfrancois.lepante@gmail.com
+ * @since 03/12/2022
+*/
 @Entity
 public class Employee {
   @Id

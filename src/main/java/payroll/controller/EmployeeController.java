@@ -81,8 +81,12 @@ public Employee createRecord(@RequestBody Employee employee) {
     return employeeRepository.findById(id)
       .map(employee -> {
         employee.setFirstname(newEmployee.getFirstname());
-        employee.setName(newEmployee.getName());
+        employee.setLastname(newEmployee.getLastname());
         employee.setEmail(newEmployee.getEmail());
+        employee.setDepartment(newEmployee.getDepartment());
+        employee.setWage(newEmployee.getWage());
+        employee.setSales_objective(newEmployee.getSales_objective());
+        employee.setHired_at(newEmployee.getHired_at());
         employee.setRole(newEmployee.getRole());
         return employeeRepository.save(employee);
       })

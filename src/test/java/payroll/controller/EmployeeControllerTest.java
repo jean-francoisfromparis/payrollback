@@ -1,65 +1,156 @@
 package payroll.controller;
 
-import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.mockito.junit.jupiter.MockitoExtension;
-// import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import java.time.LocalDate;
+import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+// import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+// import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-// import org.springframework.test.web.servlet.MockMvc;
-
-
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+// import org.springframework.test.web.servlet.MvcResult;
+// import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+// import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import payroll.model.Employee;
 import payroll.repository.EmployeeRepository;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+// import payroll.model.Employee;
 
-import java.util.List;
-
-// import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Before;
-
-@WebMvcTest(EmployeeController.class)
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class EmployeeControllerTest {
 
-    // @Autowired
-    // private MockMvc mockMvc;
+        @MockBean
+        private EmployeeRepository employeeRepository;
 
-    // @Autowired
-    // private ObjectMapper objectMapper;
+        private Optional<Employee> employee;
 
-    @MockBean
-    private EmployeeRepository employeeRepository;
+        @Autowired
+        private ObjectMapper mapper;
 
-    @Before
-    public void setup() {
+        @Autowired
+        private MockMvc mockMvc;
 
-    }
+        @SuppressWarnings( "deprecation" )
+        @Test
+        public void testListAllEmployees() throws Exception {
+                String url = "/employees";
+                int databaseSize = employeeRepository.findAll().size();
 
-    @Test
-    public void testListAllEmployees() throws Exception {
-        List<Employee> employees = new ArrayList<>();
-        // Date now = new Date();
-        employees.add(new Employee((long) 1, "Louis", "martin", "louis@martin.fr", "dsi", (float) 30000.00,
-                (float) 600000.00, "sales manager", LocalDate.now()));
-        employees.add(new Employee((long) 2, "Jeanne", "Bertrand", "jeanne@bertrand.fr", "usine1", (float) 25000.00,
-                (float) 6000.00, "chef d'équipe", LocalDate.now()));
-        employees.add(new Employee((long) 3, "Paul", "Auguste", "paul@auguste.fr", "technique", (float) 20000.00,
-                (float) 600.00, "gardien", LocalDate.now()));
+                System.out.println("database size is :" + databaseSize);
 
-        // Mockito.when(employeeRepository.findAll()).thenReturn(employees);
-        // String url = "/employees";
-        // mockMvc.perform(MockMvcRequestBuilders
-        // .get(url)
-        // .contentType(MediaType.APPLICATION_JSON))
-        // .andExpect(status().isOk())
-        // .andExpect(jsonPath("$", hasSize(3)))
-        // .andExpect(jsonPath("$[0].lastname", is("Capet")));
-    }
+                mockMvc.perform(get(url)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk());
+
+                assertThat(databaseSize, is(1000));
+        }
+
+        @SuppressWarnings( "deprecation" )
+        @Test
+        public void testListAllEmployees_ThenListSizeUncorrect() throws Exception {
+                String url = "/employees";
+                int databaseSize = employeeRepository.findAll().size();
+                mockMvc.perform(get(url)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk());
+
+                assertThat(databaseSize, is(not(950)));
+
+        }
+
+        @Test
+        public void whenPostRequestToEmployeesAndValidEmployees_thenCorrectResponse() throws Exception {
+                Employee employee = new Employee(
+                                (long) 1001,
+                                "Paul",
+                                "Auguste",
+                                "paul@auguste.fr",
+                                "technique",
+                                (float) 20000.00,
+                                (float) 600.00,
+                                "gardien",
+                                LocalDate.now());
+
+                String url = "/employees";
+
+                Mockito.when(employeeRepository.save(employee)).thenReturn(employee);
+
+                String content = mapper.writeValueAsString(employee);
+
+                MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post(url)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(content);
+
+                mockMvc.perform(mockRequest)
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$", notNullValue()))
+                                .andExpect(jsonPath("$.firstname", is("Paul")));
+        }
+
+        @Test
+        public void whenPostRequestToEmployeesAndInvalidEmployee_thenCorrectResponse() throws Exception {
+                Employee employee = new Employee(
+                                (long) 1001,
+                                "",
+                                "Auguste",
+                                "paul@auguste.fr",
+                                "technique",
+                                (float) 20000.00,
+                                (float) 600.00,
+                                "gardien",
+                                LocalDate.now());
+
+                String url = "/employees";
+
+                Mockito.when(employeeRepository.save(employee)).thenReturn(employee);
+
+                String content = mapper.writeValueAsString(employee);
+
+                MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.post(url)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(content);
+
+                mockMvc.perform(mockRequest)
+                                .andExpect(status().isBadRequest());
+        }
+
+        @Test
+        public void getTestEmployeeById_thenCorrectResponse() throws Exception {
+
+                String url = "/employeebyId/{1}";
+
+                Mockito.when(employeeRepository.findById((long) 1)).thenReturn(employee);
+
+                String content = mapper.writeValueAsString(employee);
+
+                MockHttpServletRequestBuilder mockRequest = MockMvcRequestBuilders.get(url, 1)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .content(content);
+
+                mockMvc.perform(mockRequest)
+                                .andExpect(status().isOk());
+
+        }
+
 }

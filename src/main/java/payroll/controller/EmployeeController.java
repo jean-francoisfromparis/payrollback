@@ -1,6 +1,13 @@
 package payroll.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import javax.validation.Valid;
+
+import com.github.javafaker.Faker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +48,23 @@ public class EmployeeController {
     //Récupérer tous les employées
     @GetMapping("/employees")
     public List<Employee> getEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        Random random = new Random();
+        Faker faker = new Faker();
+        for (long i = 1; i <= 1000; i++) {
+                employees.add(
+                                new Employee((long) i,
+                                                faker.name().firstName(),
+                                                faker.name().lastName(),
+                                                faker.name().firstName() + "@" + faker.name().lastName() + "." + "fr",
+                                                "dsi",
+                                                40000 * random.nextFloat(),
+                                                600000 * random.nextFloat(),
+                                                "employé.e",
+                                                LocalDate.now()));
+        }
+        ;
+        employeeRepository.saveAll(employees);
         return employeeRepository.findAll();
     }
 
@@ -55,7 +79,7 @@ public ResponseEntity<Employee> getEmployeeById(@PathVariable(value="id") Long i
 
             return new ResponseEntity<Employee>(employee, HttpStatus.OK);
 }
-    //Récupérer un employé par son email
+    //Récupérer un employé par son email - ne fonctionne pas
     @GetMapping("/employeebyemail/{email}")
     public ResponseEntity<Employee> getEmployeeByEmail(String email) {
         Employee employee = employeeCrudRepository.findByEmail(email);
@@ -70,7 +94,7 @@ public ResponseEntity<Employee> getEmployeeById(@PathVariable(value="id") Long i
 
     //Créer un employé
 @PostMapping("/employees")
-public Employee createRecord(@RequestBody Employee employee) {
+public Employee createRecord(@Valid @RequestBody Employee employee) {
     return employeeRepository.save(employee);
 }
 

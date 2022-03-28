@@ -9,6 +9,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * @Author jffromparis
  * @email jeanfrancois.lepante@gmail.com
@@ -19,24 +21,31 @@ public class Employee {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @NotBlank(message = "Le prénom doit être renseigné")
   @Column(name="firstname")
   private String firstname;
 
+  @NotBlank(message = "Le nom doit être renseigné")
   @Column(name="lastname")
   private String lastname;
 
+  @NotBlank(message = "L'email doit être renseigné")
   @Column(name="email")
   private String email;
 
+  @NotBlank(message = "Le service doit être renseigné")
   @Column(name="department")
   private String department;
 
+  // @NotBlank(message = "La rémunération doit être renseigné")
   @Column(name="wage")
   private Float wage;
 
   @Column(name="sales_objective")
   private Float sales_objective;
 
+  @NotBlank(message = "La fonction doit être renseigné")
   @Column(name="role")
   private String role;
 
